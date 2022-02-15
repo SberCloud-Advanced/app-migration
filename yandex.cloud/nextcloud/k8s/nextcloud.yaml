@@ -147,13 +147,13 @@ spec:
           ports:
           - containerPort: 8080
             name: ncport
-      resources:
-        requests:
-          cpu: '4'
-          memory: '8Gi'
-        limits:
-          cpu: '8'
-          memory: '16Gi'
+          resources:
+            requests:
+              cpu: '4'
+              memory: '8Gi'
+            limits:
+              cpu: '8'
+              memory: '16Gi'
       volumes:
       - name: app-storage
         persistentVolumeClaim:
