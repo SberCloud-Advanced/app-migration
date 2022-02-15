@@ -43,12 +43,15 @@ metadata:
     app: nextcloud
 spec:
   replicas: 1
+  serviceName: nextcloud
   selector:
     matchLabels:
+      app: nextcloud
       pod-label: nextcloud-app-pod
   template:
     metadata:
       labels:
+        app: nextcloud
         pod-label: nextcloud-app-pod
     spec:
       volumes:
@@ -150,7 +153,9 @@ spec:
               cpu: '8'
               memory: '16Gi'
           ports:
-          - containerPort: 80
+          - name: nextcloud-acc
+            containerPort: 80
+            protocol: TCP
 ---
 apiVersion: v1
 kind: Service
@@ -159,9 +164,9 @@ metadata:
   namespace: nextcloud
 spec:
   ports:
-    - port: 8080
-      name: ncout
-      targetPort: 80
+    - name: ncout
+      port: 8080
+      protocol: TCP
   selector:
     app: nextcloud
   type: LoadBalancer
