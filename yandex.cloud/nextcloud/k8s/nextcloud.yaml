@@ -5,9 +5,170 @@ metadata:
   name: nextcloud
 ---
 apiVersion: v1
-kind: Secret
+kind: PersistentVolumeClaim
 metadata:
-  name: psqlusr
+  name: nextcloud-storage
   namespace: nextcloud
-stringData:
-  
+  labels:
+    app: nextcloud
+spec:
+  storageClassName: yc-network-hdd #change storage class for advanced
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nextcloud-conf
+  namespace: nextcloud
+  labels:
+    app: nextcloud
+data:
+  # db params
+  db_name: nextcloud # database name
+  db_address: rc1b-a9ekj55b0aidt3hc # address, ip or fqdn
+  # redis params
+  redis_host: rc1b-njeahhokdbozax3r # change for advanced
+  redis_host_port: '6379' # default port
+  # s3 params
+  object_host: 'https://storage.yandexcloud.net' # change
+  object_region: ru-central1
+  # app params
+  nextcloud_data: /var/www/html/data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nextcloud-app
+  namespace: nextcloud
+  labels:
+    app: nextcloud
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      pod-label: nextcloud-app-pod
+  template:
+    metadata:
+      labels:
+        pod-label: nextcloud-app-pod
+    spec:
+      containers:
+        - name: nextcloud
+          image: nextcloud:latest
+          env:
+          # app settings
+          - name: NEXTCLOUD_ADMIN_USER
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud-secrets
+                key: nc_user
+          - name: NEXTCLOUD_ADMIN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud-secrets
+                key: nc_password
+          - name: NEXTCLOUD_DATA_DIR
+            valueFrom:
+              configMapKeyRef:
+                name: nextcloud-conf
+                key: nextcloud_data
+          # database settings
+          - name: MYSQL_DATABASE
+            valueFrom:
+              configMapKeyRef:
+                name: nextcloud-conf
+                key: db_name
+          - name: MYSQL_USER
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud-secrets
+                key: mysql_user
+          - name: MYSQL_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud-secrets
+                key: mysql_password
+          - name: MYSQL_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: nextcloud-conf
+                key: db_address
+          # s3 backend settings
+          - name: OBJECTSTORE_S3_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: nextcloud-conf
+                key: object_host
+          - name: OBJECTSTORE_S3_BUCKET
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud-secrets
+                key: object_bucket
+          - name: OBJECTSTORE_S3_KEY
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud-secrets
+                key: object_ak
+          - name: OBJECTSTORE_S3_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud-secrets
+                key: object_sk
+          - name: OBJECTSTORE_S3_REGION
+            valueFrom:
+              configMapKeyRef:
+                name: nextcloud-conf
+                key: object_region
+          # redis settings
+          - name: REDIS_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: nextcloud-conf
+                key: redis_host
+          - name: REDIS_HOST_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: nextcloud-conf
+                key: redis_host_port
+          - name: REDIS_HOST_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud-secrets
+                key: redis_password
+          # storage
+          volumeMounts:
+          - name: app-storage
+            mountPath: /var/www/html/data
+            subPath: server-data
+          ports:
+          - containerPort: 8080
+            name: ncport
+      resources:
+        requests:
+          cpu: '4'
+          memory: '8Gi'
+        limits:
+          cpu: '8'
+          memory: '16Gi'
+      volumes:
+      - name: app-storage
+        persistentVolumeClaim:
+          claimName: nextcloud-storage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud-lb
+  namespace: nextcloud
+spec:
+  ports:
+    - port: 80
+      name: out
+      targetPort: 8080
+  selector:
+    app: nextcloud
+  type: LoadBalancer
