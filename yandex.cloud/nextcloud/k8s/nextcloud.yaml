@@ -149,6 +149,8 @@ spec:
             limits:
               cpu: '8'
               memory: '16Gi'
+          ports:
+          - containerPort: 80
 ---
 apiVersion: v1
 kind: Service
@@ -157,7 +159,7 @@ metadata:
   namespace: nextcloud
 spec:
   ports:
-    - port: 80
+    - port: 8080
       name: ncout
       targetPort: 80
   selector:
