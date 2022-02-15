@@ -43,9 +43,6 @@ metadata:
     app: nextcloud
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      app: nextcloud
   template:
     metadata:
       creationTimestamp: null
