@@ -150,8 +150,11 @@ spec:
               cpu: '8'
               memory: '16Gi'
           ports:
-          - name: nextcloud-acc
+          - name: nc-http
             containerPort: 80
+            protocol: TCP
+          - name: nc-https
+            containerPort: 443
             protocol: TCP
 ---
 apiVersion: v1
@@ -161,8 +164,11 @@ metadata:
   namespace: nextcloud
 spec:
   ports:
-    - name: ncout
-      port: 8080
+    - name: nc-http
+      port: 80
+      protocol: TCP
+    - name: nc-https
+      port: 443
       protocol: TCP
   selector:
     app: nextcloud
