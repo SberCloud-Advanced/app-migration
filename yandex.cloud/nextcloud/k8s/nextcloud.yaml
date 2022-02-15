@@ -44,11 +44,10 @@ metadata:
 spec:
   replicas: 1
   selector:
-    labels:
+    matchLabels:
       app: nextcloud
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: nextcloud
     spec:
