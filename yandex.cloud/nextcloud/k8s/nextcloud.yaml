@@ -50,7 +50,6 @@ spec:
     metadata:
       labels:
         app: nextcloud
-        pod-label: nextcloud-app-pod
     spec:
       volumes:
       - name: app-storage
