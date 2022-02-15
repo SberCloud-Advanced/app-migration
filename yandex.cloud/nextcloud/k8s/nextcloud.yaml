@@ -39,8 +39,6 @@ kind: Deployment
 metadata:
   name: nextcloud-app
   namespace: nextcloud
-  labels:
-    app: nextcloud
 spec:
   replicas: 1
   selector:
