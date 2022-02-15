@@ -145,7 +145,7 @@ spec:
             mountPath: /var/www/html/data
             subPath: server-data
           ports:
-          - containerPort: 8080
+          - containerPort: 80
             name: ncport
           resources:
             requests:
@@ -166,9 +166,9 @@ metadata:
   namespace: nextcloud
 spec:
   ports:
-    - port: 80
+    - port: 8080
       name: out
-      targetPort: 8080
+      targetPort: 80
   selector:
     app: nextcloud
   type: LoadBalancer
