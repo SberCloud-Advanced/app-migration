@@ -44,8 +44,7 @@ metadata:
 spec:
   replicas: 1
   selector:
-    matchLabels:
-      app: nextcloud
+    app: nextcloud
   template:
     metadata:
       creationTimestamp: null
@@ -166,6 +165,5 @@ spec:
       port: 8080
       protocol: TCP
   selector:
-    matchLabels:
-      app: nextcloud
+    app: nextcloud
   type: LoadBalancer
