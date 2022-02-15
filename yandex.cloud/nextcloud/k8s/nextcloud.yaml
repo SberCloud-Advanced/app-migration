@@ -29,9 +29,9 @@ metadata:
 data:
   # db params
   db_name: nextcloud # database name
-  db_address: rc1b-a9ekj55b0aidt3hc # address, ip or fqdn
+  db_address: '10.129.0.30' # address, ip or fqdn
   # redis params
-  redis_host: rc1b-njeahhokdbozax3r # change for advanced
+  redis_host: '10.129.0.11' # change for advanced
   redis_host_port: '6379' # default port
   # s3 params
   object_host: 'https://storage.yandexcloud.net' # change
