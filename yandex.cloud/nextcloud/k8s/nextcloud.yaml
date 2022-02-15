@@ -32,7 +32,7 @@ data:
   object_host: 'https://storage.yandexcloud.net' # change
   object_region: ru-central1
   # app params
-  nextcloud_data: /www/html/data
+  nextcloud_data: /var/www/html/data
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -141,7 +141,7 @@ spec:
           # storage
           volumeMounts:
           - name: app-storage
-            mountPath: /www/html/data
+            mountPath: /var/www/html
           ports:
           - containerPort: 80
             name: ncport
