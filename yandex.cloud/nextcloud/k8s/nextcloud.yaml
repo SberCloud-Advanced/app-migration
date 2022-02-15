@@ -51,6 +51,10 @@ spec:
       labels:
         pod-label: nextcloud-app-pod
     spec:
+      volumes:
+      - name: app-storage
+        persistentVolumeClaim:
+          claimName: nextcloud-storage
       containers:
         - name: nextcloud
           image: nextcloud:latest
@@ -148,10 +152,6 @@ spec:
             limits:
               cpu: '8'
               memory: '16Gi'
-      volumes:
-      - name: app-storage
-        persistentVolumeClaim:
-          claimName: nextcloud-storage
 ---
 apiVersion: v1
 kind: Service
