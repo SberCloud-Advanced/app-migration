@@ -142,9 +142,6 @@ spec:
           volumeMounts:
           - name: app-storage
             mountPath: /var/www/html
-          ports:
-          - containerPort: 80
-            name: ncport
           resources:
             requests:
               cpu: '4'
@@ -160,8 +157,8 @@ metadata:
   namespace: nextcloud
 spec:
   ports:
-    - port: 8080
-      name: out
+    - port: 80
+      name: ncout
       targetPort: 80
   selector:
     app: nextcloud
