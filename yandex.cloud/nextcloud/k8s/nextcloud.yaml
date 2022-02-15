@@ -45,7 +45,7 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-    - app: nextcloud
+      app: nextcloud
   template:
     metadata:
       labels:
