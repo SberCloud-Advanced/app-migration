@@ -61,7 +61,7 @@ spec:
           claimName: nextcloud-storage
       containers:
         - name: nextcloud
-          image: nextcloud:latest
+          image: nextcloud:fpm
           env:
           # system
           - name: TZ
