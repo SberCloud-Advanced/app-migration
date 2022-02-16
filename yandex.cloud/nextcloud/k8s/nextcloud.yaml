@@ -123,21 +123,21 @@ spec:
                 name: nextcloud-conf
                 key: object_region
           # redis settings
-          - name: REDIS_HOST
-            valueFrom:
-              configMapKeyRef:
-                name: nextcloud-conf
-                key: redis_host
-          - name: REDIS_HOST_PORT
-            valueFrom:
-              configMapKeyRef:
-                name: nextcloud-conf
-                key: redis_host_port
-          - name: REDIS_HOST_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: nextcloud-secrets
-                key: redis_password
+          #- name: REDIS_HOST
+          #  valueFrom:
+          #    configMapKeyRef:
+          #      name: nextcloud-conf
+          #      key: redis_host
+          #- name: REDIS_HOST_PORT
+          #  valueFrom:
+          #    configMapKeyRef:
+          #      name: nextcloud-conf
+          #      key: redis_host_port
+          #- name: REDIS_HOST_PASSWORD
+          #  valueFrom:
+          #    secretKeyRef:
+          #      name: nextcloud-secrets
+          #      key: redis_password
           # storage
           volumeMounts:
           - name: app-storage
