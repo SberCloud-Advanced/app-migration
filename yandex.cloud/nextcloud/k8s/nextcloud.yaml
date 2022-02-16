@@ -31,8 +31,12 @@ data:
   # s3 params
   object_host: 'https://storage.yandexcloud.net' # change
   object_region: ru-central1
+  object_port: '443'
   # app params
   nextcloud_data: /var/www/html/data
+  nextcloud_url: http://nextcloud.ghostklart.com
+  nextcloud_upload: 12G
+  nextcloud_file_upload: "20"
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -59,7 +63,15 @@ spec:
         - name: nextcloud
           image: nextcloud:latest
           env:
+          # system
+          - name: TZ
+            value: Europe/Moscow
           # app settings
+          - name: NEXTCLOUD_URL
+            valueFrom:
+              configMapKeyRef:
+                name: nextcloud-conf
+                key: nextcloud_url
           - name: NEXTCLOUD_ADMIN_USER
             valueFrom:
               secretKeyRef:
@@ -75,6 +87,16 @@ spec:
               configMapKeyRef:
                 name: nextcloud-conf
                 key: nextcloud_data
+          - name: NEXTCLOUD_UPLOAD_MAX_FILESIZE
+            valueFrom:
+              configMapKeyRef:
+                name: nextcloud-conf
+                key: nextcloud_upload
+          - name: NEXTCLOUD_MAX_FILE_UPLOADS
+            valueFrom:
+              configMapKeyRef:
+                name: nextcloud-conf
+                key: nextcloud_file_upload
           # database settings
           - name: MYSQL_DATABASE
             valueFrom:
@@ -122,22 +144,29 @@ spec:
               configMapKeyRef:
                 name: nextcloud-conf
                 key: object_region
+          - name: OBJECTSTORE_S3_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: nextcloud-conf
+                key: object_port
+          - name: OBJECTSTORE_S3_USEPATH_STYLE
+            value: true
           # redis settings
-          #- name: REDIS_HOST
-          #  valueFrom:
-          #    configMapKeyRef:
-          #      name: nextcloud-conf
-          #      key: redis_host
-          #- name: REDIS_HOST_PORT
-          #  valueFrom:
-          #    configMapKeyRef:
-          #      name: nextcloud-conf
-          #      key: redis_host_port
-          #- name: REDIS_HOST_PASSWORD
-          #  valueFrom:
-          #    secretKeyRef:
-          #      name: nextcloud-secrets
-          #      key: redis_password
+          - name: REDIS_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: nextcloud-conf
+                key: redis_host
+          - name: REDIS_HOST_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: nextcloud-conf
+                key: redis_host_port
+          - name: REDIS_HOST_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: nextcloud-secrets
+                key: redis_password
           # storage
           volumeMounts:
           - name: app-storage
@@ -153,9 +182,6 @@ spec:
           - name: nc-http
             containerPort: 80
             protocol: TCP
-          - name: nc-https
-            containerPort: 443
-            protocol: TCP
 ---
 apiVersion: v1
 kind: Service
@@ -166,9 +192,7 @@ spec:
   ports:
     - name: nc-http
       port: 80
-      protocol: TCP
-    - name: nc-https
-      port: 443
+      targetPort: 80
       protocol: TCP
   selector:
     app: nextcloud
